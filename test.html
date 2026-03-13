@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Higiene Sanitasi Pangan</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Login Form */
+        #login-page {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        /* Exam Page */
+        #exam-page {
+            display: none;
+            width: 95%;
+            max-width: 1000px;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin: 20px;
+        }
+
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .main-content {
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        #question-container {
+            flex: 2;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+        }
+
+        .sidebar {
+            flex: 1;
+            max-width: 250px;
+        }
+
+        .grid-nav {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+
+        .nav-btn {
+            padding: 10px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .nav-btn.active { background: var(--accent); color: white; }
+        .nav-btn.answered { background: var(--success); color: white; }
+
+        .option-item {
+            display: block;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .option-item:hover { background: #f8f9fa; }
+        input[type="radio"] { margin-right: 10px; }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .btn-start { background: var(--accent); color: white; margin-top: 10px; }
+        .btn-finish { background: var(--success); color: white; margin-top: 20px; }
+        
+        #timer { font-weight: bold; font-size: 1.2rem; background: var(--danger); padding: 5px 15px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<div id="login-page">
+    <h2 style="text-align: center;">Form Data Relawan</h2>
+    <div class="input-group">
+        <label>Nama SPPG</label>
+        <input type="text" id="sppg" placeholder="Masukkan nama SPPG">
+    </div>
+    <div class="input-group">
+        <label>Nama Relawan</label>
+        <input type="text" id="relawan" placeholder="Masukkan nama lengkap">
+    </div>
+    <div class="input-group">
+        <label>Divisi</label>
+        <select id="divisi">
+            <option value="">-- Pilih Divisi --</option>
+            <option value="Kepala Dapur (Koordinator SPPG)">Jurutama Kepala Dapur (Koordinator SPPG)</option>
+            <option value="Tim Pengadaan (Purchasing)">Tim Pengadaan (Purchasing)</option>
+            <option value="Tim Produksi/Juru Masak (Chef & Asisten)">Tim Produksi/Juru Masak (Chef & Asisten)</option>
+            <option value="Tim Persiapan (Preparation) & Packing">Tim Persiapan (Preparation) & Packing</option>
+            <option value="Tim Distribusi/Logistik">Tim Distribusi/Logistik</option>
+            <option value="Tim Kebersihan & Sanitasi">Tim Kebersihan & Sanitasi</option>
+        </select>
+    </div>
+    <button class="btn btn-start" onclick="startExam()">Mulai Ujian</button>
+</div>
+
+<div id="exam-page">
+    <header>
+        <div>
+            <small id="user-info"></small>
+            <h3 style="margin:0">Ujian Higiene Sanitasi Pangan</h3>
+        </div>
+        <div id="timer">30:00</div>
+    </header>
+
+    <div class="main-content">
+        <div id="question-container">
+            <h4 id="q-number">Soal Nomor 1</h4>
+            <p id="q-text">Loading soal...</p>
+            <div id="options-list"></div>
+            <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn" style="background:#95a5a6; color:white" onclick="prevQuestion()">Kembali</button>
+                <button class="btn" style="background:var(--accent); color:white" onclick="nextQuestion()">Lanjut</button>
+            </div>
+        </div>
+
+        <aside class="sidebar">
+            <p><strong>Navigasi Soal</strong></p>
+            <div class="grid-nav" id="grid-nav"></div>
+            <button class="btn btn-finish" onclick="finishExam()">Selesai Ujian</button>
+        </aside>
+    </div>
+</div>
+
+<script>
+    const questions = [
+        { q: "Cemaran Pangan Terdiri Dari:", a: ["Cemaran Fisik", "Cemaran Biologi", "Cemaran Kimia", "A, B dan C", "Cemaran toksin"], correct: 3 },
+        { q: "Jumlah Penjamah Pangan Yang Harus Memiliki Sertifikat Pelatihan Keamanan Pangan Siap Saji Di Restoran Adalah:", a: ["Minimal 20% penjamah pangan", "Minimal 50% penjamah pangan", "Minimal 70% penjamah pangan", "Minimal 80% penjamah pangan", "Minimal 100 penjamah pangan"], correct: 1 },
+        { q: "Jenis Tempat Pengelolaan Pangan Yang Mendapatkan Lebel Pembinaan HSP adalah:", a: ["Sentra Pangan Jajanan dan Usaha Sejenisnya", "Restoran", "Depot Air Minum", "Jasaboga", "Semua Jawaban Benar"], correct: 4 },
+        { q: "Manakah Yang Bukan Tindakan Pencegahan Pada Penyakit Bawaan Makanan (PBM)?", a: ["Cuci Tangan (pakai sabun)", "Hindari Konsumsi Produk Olahan Susu Yang Belum dipasteurisasi", "Menyatukan Bahan Pangan Mentah dan Matang Dalam Lemari Penyimpanan", "Perhatikan Penyimpanan Makanan", "Menerapkan FIFO"], correct: 2 },
+        { q: "Parameter Uji Biologi Yang Wajib Diperiksa Untuk Kebutuhan Penerbitan SLHS Adalah:", a: ["Eschericia coli", "Salmonella sp", "Staphylococcus aureus", "Bacillus cereus", "Listeria monocytogenes"], correct: 0 },
+        { q: "Sasaran Pengendalian Dalam Hygiene Sanitasi Pangan Yang Benar Adalah Yaitu:", a: ["Tempat/bangunan, bahan makanan, perlengkapan administrasi dan orang", "Peralatan, bahan makanan, tempa dan perlengkapan administrasi", "Tempat/bangunan, peralatan, orang dan pengelolaan makanan", "Bahan makanan, tempat/bangunan, orang dan perlengkapan administrasi", "Administrasi, tempat/bangunan dan orang"], correct: 2 },
+        { q: "Dasar Hukum Dalam Mengajukan SLHS Adalah", a: ["Permenkes Nomor 2 Tahun 2013", "Permenkes Nomor 5 Tahun 2021", "Permenkes Nomor 17 Tahun 2024", "Permenkes Nomor 15 Tahun 2021", "Permenkes Nomor 16 Tahun 2021"], correct: 1 },
+        { q: "Pangan Yang Sering Menimbulkan Alergi:", a: ["Susu sapi, telur, jengkol, daun singkong", "Pisang, sayur nangka, kacang mede", "Tempe, tahu, kacang mede, coklat", "Daging, pisang, tahu, tempe", "Susu sapi, telur, kacang mede, ikan, kerang hijau, udang"], correct: 4 },
+        { q: "Mayoritas Penyakit Bawaan Pangan Biasanya Disebabkan Oleh Cemaran", a: ["Fisika", "Biologi", "Kimia", "Fisika (lagi)", "Toksin"], correct: 1 },
+        { q: "Respon Sistem Kekebalan Tubuh Yang Tidak Normal Terhadap Zat-Zat Umum Disebut", a: ["Reaksi spontan", "Reaksi normal", "Reaksi allergen", "Reaksi alergi", "Reaksi kekebalan tubuh"], correct: 3 },
+        { q: "Orang Yang Secara Langsung Berhubungan Dengan Makanan dan Peralatan Disebut:", a: ["Peralatan Makanan", "Hygience Sanitasi Pengan", "Supervisor Manager", "Penjamah Makanan", "Chef"], correct: 3 },
+        { q: "Cara Higienis Dalam Penanganan Makanan Pada Saat Bekerja Adalah", a: ["Simpan makanan sesuai prinsip hygiene", "Penyimpanan bahan mentah dan jadi satu tempat", "Mencicipi dengan jari", "Merokok", "Tanpa APD"], correct: 0 },
+        { q: "Vektor dan Binatang Pembawa Penyakit Yang Berhubungan Dengan Keamanan Pangan:", a: ["Kecoak, lalat dan tikus", "Kecoak, nyamuk dan kucing", "Kecoak, nyamuk dan unggas", "Lalat, tikus, kucing", "Lalat, nyamuk, unggas"], correct: 0 },
+        { q: "Suhu Yang Dapat Menahan Pertumbuhan Bakteri Yaitu:", a: ["< 5 Celcius", "> 5 Celcius", "5 - 25 Celcius", "25 - 45 Celcius", "Suhu Ruangan"], correct: 0 },
+        { q: "Jenis TPP Berikut Memiliki Kewajiban SLHS Kecuali:", a: ["Jasa boga", "Restoran", "Depot air minum", "TPP tertentu", "Sentra pangan jajanan"], correct: 3 },
+        { q: "Jasa Boga Dengan Pelayanan Tidak Lebih Dari 750 Porsi/hari Adalah:", a: ["Jasa boga A", "Jasa boga B", "Jasa boga C", "Jasa boga A1", "Jasa boga A2"], correct: 4 },
+        { q: "Mikroorganisme Yang Paling Berasosiasi Dengan Buruknya Higiene Perorangan:", a: ["E. coli", "Salmonella sp", "Staphylococcus aureus", "Bacillus cereus", "Listeria"], correct: 2 },
+        { q: "Kondisi Yang Cocok Untuk Bakteri Berkembang Biak:", a: ["Suhu, waktu, kelembaban, oksigen", "Suhu, waktu, kelembaban, oksigen, pH, cahaya", "Suhu, tanggal, pH, cahaya", "Suhu, oksigen, pH, cahaya", "Tempat, waktu, pH"], correct: 1 },
+        { q: "KBLI adalah?", a: ["Klasifikasi Baku Lapangan Usaha Indonesia", "Klasifikasi Berusaha lapangan Indonesia", "Klasifikasi Berusaha lingkungan Indonesia", "Klasifikasi Bagian lingkup Indonesia", "Kode Baku lapangan Usaha Indonesia"], correct: 0 },
+        { q: "Masalah Penyalahgunaan Bahan Tambahan Pangan (BTP) Yang Dilarang:", a: ["Penggunaan melebihi dosis", "Penggunaan bahan non makanan", "Penggunaan pengawet berlebihan", "Dikonsumsi langsung", "Semua Benar"], correct: 4 }
+    ];
+
+    let currentQ = 0;
+    let answers = new Array(questions.length).fill(null);
+    let timeLeft = 1800; // 30 menit
+
+    function startExam() {
+        const sppg = document.getElementById('sppg').value;
+        const relawan = document.getElementById('relawan').value;
+        const divisi = document.getElementById('divisi').value;
+
+        if(!sppg || !relawan || !divisi) {
+            alert("Harap isi semua data terlebih dahulu!");
+            return;
+        }
+
+        document.getElementById('login-page').style.display = 'none';
+        document.getElementById('exam-page').style.display = 'block';
+        document.getElementById('user-info').innerText = `${relawan} | ${divisi} | ${sppg}`;
+        
+        renderNav();
+        showQuestion();
+        startTimer();
+    }
+
+    function renderNav() {
+        const nav = document.getElementById('grid-nav');
+        nav.innerHTML = "";
+        questions.forEach((_, i) => {
+            const btn = document.createElement('div');
+            btn.className = `nav-btn ${i === currentQ ? 'active' : ''} ${answers[i] !== null ? 'answered' : ''}`;
+            btn.innerText = i + 1;
+            btn.onclick = () => { currentQ = i; showQuestion(); };
+            nav.appendChild(btn);
+        });
+    }
+
+    function showQuestion() {
+        const q = questions[currentQ];
+        document.getElementById('q-number').innerText = `Soal Nomor ${currentQ + 1}`;
+        document.getElementById('q-text').innerText = q.q;
+        
+        const optionsDiv = document.getElementById('options-list');
+        optionsDiv.innerHTML = "";
+        
+        q.a.forEach((opt, i) => {
+            const label = document.createElement('label');
+            label.className = 'option-item';
+            const checked = answers[currentQ] === i ? 'checked' : '';
+            label.innerHTML = `<input type="radio" name="answer" value="${i}" ${checked} onchange="saveAnswer(${i})"> ${opt}`;
+            optionsDiv.appendChild(label);
+        });
+        renderNav();
+    }
+
+    function saveAnswer(idx) {
+        answers[currentQ] = idx;
+        renderNav();
+    }
+
+    function nextQuestion() {
+        if(currentQ < questions.length - 1) {
+            currentQ++;
+            showQuestion();
+        }
+    }
+
+    function prevQuestion() {
+        if(currentQ > 0) {
+            currentQ--;
+            showQuestion();
+        }
+    }
+
+    function startTimer() {
+        const timerNode = document.getElementById('timer');
+        const interval = setInterval(() => {
+            let min = Math.floor(timeLeft / 60);
+            let sec = timeLeft % 60;
+            timerNode.innerText = `${min}:${sec < 10 ? '0'+sec : sec}`;
+            if(timeLeft <= 0) {
+                clearInterval(interval);
+                finishExam();
+            }
+            timeLeft--;
+        }, 1000);
+    }
+
+    function finishExam() {
+        let score = 0;
+        answers.forEach((ans, i) => {
+            if(ans === questions[i].correct) score++;
+        });
+        
+        const finalScore = (score / questions.length) * 100;
+        alert(`Ujian Selesai!\nSkor Anda: ${finalScore}\nBenar: ${score} dari ${questions.length} soal.`);
+        location.reload();
+    }
+</script>
+
+</body>
+</html>
